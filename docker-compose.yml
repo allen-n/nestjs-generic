@@ -1,0 +1,44 @@
+services:
+  db:
+    # To mirror the image railway uses minus the postgis since there isn't arm compatability for it: https://docs.railway.app/databases/postgresql#image
+    image: timescale/timescaledb:latest-pg15
+    restart: always
+    container_name: postgres
+    hostname: postgres
+    environment:
+      PGUSER: postgres
+      POSTGRES_PASSWORD: example
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready']
+      interval: 1s
+      timeout: 5s
+      retries: 10
+    ports:
+      - 5432:5432
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      db:
+        condition: service_healthy
+
+  server:
+    env_file: .docker.env
+    container_name: server
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

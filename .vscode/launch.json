@@ -1,0 +1,17 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Start Debug Server",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "preLaunchTask": "docker-compose-up",
+      "postDebugTask": "docker-compose-down",
+      "runtimeArgs": ["run", "start:dev"],
+
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    }
+  ]
+}

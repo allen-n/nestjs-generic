@@ -1,0 +1,5 @@
+{
+  "cSpell.words": ["adminer", "Fastify", "HVAC", "nestjs", "wattshift"],
+  "debug.allowBreakpointsEverywhere": true,
+  "typescript.preferences.importModuleSpecifier": "non-relative"
+}
