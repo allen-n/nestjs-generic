@@ -15,10 +15,10 @@ import { ApiExcludeController, ApiTags } from '@nestjs/swagger';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 
+import { ApiKeyService } from '@utils/api-key/api-key.service';
 import { JwtAuthGuard } from '@utils/auth/guards/jwt-auth.guard';
 import { AuthenticatedPrivateRequest } from '@utils/auth/types';
 import { JwtBearer, SHOW_CONTROLLER_IN_SWAGGER } from '@utils/header';
-import { AuthService } from '@utils/auth/auth.service';
 
 const CONTROLLER_NAME = `user`;
 @ApiTags(CONTROLLER_NAME)
@@ -29,7 +29,7 @@ const CONTROLLER_NAME = `user`;
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-    private readonly authService: AuthService,
+    private readonly apiKeyService: ApiKeyService,
   ) {}
 
   @Get()
@@ -62,7 +62,7 @@ export class UsersController {
 
   @Get('api-keys')
   async getApiKeys(@Request() req: AuthenticatedPrivateRequest) {
-    return this.authService.findKeyByOwner(req.user.userId);
+    return this.apiKeyService.findKeyByOwner(req.user.userId);
   }
 
   @Post('api-key')
@@ -71,7 +71,7 @@ export class UsersController {
     if (!user) {
       throw new HttpException(`Error: No user found `, HttpStatus.NOT_FOUND);
     }
-    return this.authService.createKey({
+    return this.apiKeyService.createKey({
       userId: user.id,
       organizationId: user.organizationId,
     });
@@ -86,6 +86,6 @@ export class UsersController {
     if (!user) {
       throw new HttpException(`Error: No user found `, HttpStatus.NOT_FOUND);
     }
-    return this.authService.deleteKey(id, user.id, user.organizationId);
+    return this.apiKeyService.deleteKey(id, user.id, user.organizationId);
   }
 }
