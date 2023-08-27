@@ -1,5 +1,5 @@
 import { Request } from '@nestjs/common';
-import { ApiKey } from '@prisma/client';
+import { ApiKey, User } from '@prisma/client';
 
 export type jwtPayload = {
   username: string;
@@ -12,8 +12,12 @@ export type validatedJwtUserInfo = {
   refreshToken?: string;
 };
 
-export interface AuthenticatedPrivateRequest extends Request {
+export interface JwtAuthenticatedRequest extends Request {
   user: validatedJwtUserInfo;
+}
+
+export interface PasswordAuthenticatedRequest extends Request {
+  user: User;
 }
 
 export interface AuthenticatedRequest extends Request {

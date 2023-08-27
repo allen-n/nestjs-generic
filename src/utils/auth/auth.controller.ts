@@ -15,7 +15,10 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '@utils/auth/guards/jwt-auth.guard';
 import { RefreshTokenGuard } from '@utils/auth/guards/refresh-token.guard';
-import { AuthenticatedPrivateRequest } from '@utils/auth/types';
+import {
+  JwtAuthenticatedRequest,
+  PasswordAuthenticatedRequest,
+} from '@utils/auth/types';
 import {
   SHOW_CONTROLLER_IN_SWAGGER,
   JwtBearer,
@@ -49,7 +52,7 @@ export class AuthController {
       },
     },
   })
-  async login(@Request() req: AuthenticatedPrivateRequest) {
+  async login(@Request() req: PasswordAuthenticatedRequest) {
     return this.authService.login(req.user);
   }
 
@@ -57,14 +60,14 @@ export class AuthController {
   @JwtHeader
   @ApiBearerAuth(sJwtBearer)
   @UseGuards(JwtAuthGuard)
-  async logout(@Request() req: AuthenticatedPrivateRequest) {
+  async logout(@Request() req: JwtAuthenticatedRequest) {
     return this.authService.logout(req.user);
   }
 
   @Get('refresh')
   @ApiBearerAuth(sJwtBearer)
   @UseGuards(RefreshTokenGuard)
-  async refresh(@Request() req: AuthenticatedPrivateRequest) {
+  async refresh(@Request() req: JwtAuthenticatedRequest) {
     return this.authService.refreshTokens(
       req.user.userId,
       req.user.refreshToken,

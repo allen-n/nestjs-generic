@@ -6,12 +6,12 @@ import {
   Injectable,
   Logger,
 } from '@nestjs/common';
-import { AuthService } from '@utils/auth/auth.service';
+import { ApiKeyService } from '@utils/api-key/api-key.service';
 import { AuthenticatedRequest } from '@utils/auth/types';
 
 @Injectable()
 export class ApiKeyGuard implements CanActivate {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly apiKeyService: ApiKeyService) {}
   private readonly logger = new Logger(ApiKeyGuard.name);
   private sApiKeyBearer = 'x-api-key';
 
@@ -23,7 +23,7 @@ export class ApiKeyGuard implements CanActivate {
       this.logger.warn(`No API key provided. ${reqInfoString}`);
       throw new HttpException('No API key provided', HttpStatus.UNAUTHORIZED);
     }
-    const keyObject = await this.authService.getKeyWithMetadata(key);
+    const keyObject = await this.apiKeyService.getKeyWithMetadata(key);
     if (!keyObject) {
       this.logger.warn(
         'Invalid API key provided: ' + key + '. ' + reqInfoString,

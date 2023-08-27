@@ -1,11 +1,13 @@
 import { AppModule } from '@app/app.module';
-import { ValidationPipe, VersioningType } from '@nestjs/common';
+import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { EnvironmentVariables } from '@utils/config/config';
 
 import { sApiKeyBearer, sJwtBearer } from '@utils/header';
 
@@ -15,6 +17,7 @@ async function bootstrap() {
     new FastifyAdapter({ logger: false }),
   );
   app.useGlobalPipes(new ValidationPipe());
+  const logger = new Logger('NestBootstrap');
 
   // Create a Swagger document options
   const options = new DocumentBuilder()
@@ -54,8 +57,10 @@ async function bootstrap() {
   // Set up Swagger UI
   SwaggerModule.setup(`docs`, app, document);
 
-  const PORT = process.env.PORT || 3000;
+  const configService = app.get(ConfigService<EnvironmentVariables>);
+  const PORT = configService.get('PORT', { infer: true });
+
   await app.listen(PORT, '0.0.0.0'); // MUST specify 0.0.0.0 using fastify
-  console.log(`Listening on port ${PORT}`);
+  logger.log(`Listening on port ${PORT}`);
 }
 bootstrap();
