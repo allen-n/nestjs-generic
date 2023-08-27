@@ -10,7 +10,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import { BcryptService } from '@utils/auth/bcrypt';
-import { EnvKeys } from '@utils/env';
+import { EnvironmentVariables } from '@utils/config/config';
 import { validatedJwtUserInfo } from './types';
 
 @Injectable()
@@ -20,7 +20,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly bcryptService: BcryptService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService<EnvironmentVariables>,
   ) {}
 
   async signup(data: CreateUserDto) {
@@ -94,7 +94,7 @@ export class AuthService {
         },
         {
           expiresIn: '15m',
-          secret: this.configService.getOrThrow(EnvKeys.JWT_ACCESS_SECRET),
+          secret: this.configService.get('JWT_ACCESS_SECRET', { infer: true }),
         },
       ),
       this.jwtService.signAsync(
@@ -103,7 +103,7 @@ export class AuthService {
           username: email,
         },
         {
-          secret: this.configService.getOrThrow(EnvKeys.JWT_REFRESH_SECRET),
+          secret: this.configService.get('JWT_REFRESH_SECRET', { infer: true }),
           expiresIn: '7d',
         },
       ),

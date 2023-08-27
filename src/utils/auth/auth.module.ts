@@ -8,7 +8,7 @@ import { RefreshTokenStrategy } from '@utils/auth/strategies/refreshToken.strate
 
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ApiKeyService } from '@utils/api-key/api-key.service';
-import { EnvKeys } from '@utils/env';
+import { EnvironmentVariables } from '@utils/config/config';
 import { PrismaService } from '@utils/prisma/prisma.service';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -30,8 +30,10 @@ import { LocalStrategy } from './strategies/local.strategy';
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.getOrThrow(EnvKeys.JWT_ACCESS_SECRET),
+      useFactory: async (
+        configService: ConfigService<EnvironmentVariables>,
+      ) => ({
+        secret: configService.get('JWT_ACCESS_SECRET', { infer: true }),
         signOptions: { expiresIn: '15m', algorithm: 'HS384' },
         verifyOptions: {
           algorithms: ['HS384'],
