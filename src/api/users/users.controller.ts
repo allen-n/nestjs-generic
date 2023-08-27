@@ -17,7 +17,7 @@ import { UsersService } from './users.service';
 
 import { ApiKeyService } from '@utils/api-key/api-key.service';
 import { JwtAuthGuard } from '@utils/auth/guards/jwt-auth.guard';
-import { AuthenticatedPrivateRequest } from '@utils/auth/types';
+import { JwtAuthenticatedRequest } from '@utils/auth/types';
 import { JwtBearer, SHOW_CONTROLLER_IN_SWAGGER } from '@utils/header';
 
 const CONTROLLER_NAME = `user`;
@@ -33,7 +33,7 @@ export class UsersController {
   ) {}
 
   @Get()
-  async findOne(@Request() req: AuthenticatedPrivateRequest) {
+  async findOne(@Request() req: JwtAuthenticatedRequest) {
     const user = await this.usersService.findOne(req.user.userId);
     if (!user) {
       throw new HttpException(`Error: No user found `, HttpStatus.NOT_FOUND);
@@ -43,7 +43,7 @@ export class UsersController {
 
   @Patch()
   update(
-    @Request() req: AuthenticatedPrivateRequest,
+    @Request() req: JwtAuthenticatedRequest,
     @Body() updateUserDto: UpdateUserDto,
   ) {
     if (!req.user.userId) {
@@ -53,7 +53,7 @@ export class UsersController {
   }
 
   @Delete()
-  remove(@Request() req: AuthenticatedPrivateRequest) {
+  remove(@Request() req: JwtAuthenticatedRequest) {
     if (!req.user.userId) {
       throw new HttpException(`Error: No user found `, HttpStatus.NOT_FOUND);
     }
@@ -61,12 +61,12 @@ export class UsersController {
   }
 
   @Get('api-keys')
-  async getApiKeys(@Request() req: AuthenticatedPrivateRequest) {
+  async getApiKeys(@Request() req: JwtAuthenticatedRequest) {
     return this.apiKeyService.findKeyByOwner(req.user.userId);
   }
 
   @Post('api-key')
-  async createApiKey(@Request() req: AuthenticatedPrivateRequest) {
+  async createApiKey(@Request() req: JwtAuthenticatedRequest) {
     const user = await this.usersService.findOne(req.user.userId);
     if (!user) {
       throw new HttpException(`Error: No user found `, HttpStatus.NOT_FOUND);
@@ -80,7 +80,7 @@ export class UsersController {
   @Delete('api-key/:id')
   async deleteApiKey(
     @Param('id') id: string,
-    @Request() req: AuthenticatedPrivateRequest,
+    @Request() req: JwtAuthenticatedRequest,
   ) {
     const user = await this.usersService.findOne(req.user.userId);
     if (!user) {

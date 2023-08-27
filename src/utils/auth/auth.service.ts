@@ -62,8 +62,8 @@ export class AuthService {
    * @param user
    * @returns
    */
-  async login(user: validatedJwtUserInfo) {
-    const tokens = await this.getTokens(user.userId, user.email);
+  async login(user: User) {
+    const tokens = await this.getTokens(user.id, user.email);
     return {
       username: user.email,
       ...tokens,
