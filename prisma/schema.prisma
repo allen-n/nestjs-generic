@@ -18,19 +18,29 @@ datasource db {
 
 // A user of the WattShift client app
 model User {
-  id             String       @id @default(cuid())
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  email          String       @unique
-  emailVerified  Boolean      @default(false)
+  id             String          @id @default(cuid())
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  email          String          @unique
+  emailVerified  Boolean         @default(false)
   passwordHash   String
-  username       String?      @unique
+  username       String?         @unique
   name           String?
   timezone       String?
   refreshToken   String?
-  organization   Organization @relation(fields: [organizationId], references: [id])
+  organization   Organization    @relation(fields: [organizationId], references: [id])
   organizationId String
   apiKeys        ApiKey[]
+  PasswordReset  PasswordReset[]
+}
+
+model PasswordReset {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  token     String   @unique
 }
 
 model Organization {

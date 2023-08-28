@@ -27,6 +27,12 @@ import {
 } from '../header';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import {
+  CheckPasswordResetDto,
+  PasswordResetDto,
+} from '@utils/auth/dto/password-reset.dto';
+import { UsersService } from '@api/users/users.service';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 const CONTROLLER_NAME = `auth`;
 @ApiTags(CONTROLLER_NAME)
@@ -34,7 +40,10 @@ const CONTROLLER_NAME = `auth`;
 @JwtBearer
 @Controller(CONTROLLER_NAME)
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UsersService,
+  ) {}
 
   @Post('signup')
   async create(@Body() createUserDto: CreateUserDto) {
@@ -72,5 +81,25 @@ export class AuthController {
       req.user.userId,
       req.user.refreshToken,
     );
+  }
+
+  @Post('password-reset/start')
+  async passwordReset(@Body() data: PasswordResetDto) {
+    return this.authService.sendPasswordResetEmail(data.email);
+  }
+
+  @Post('password-reset/check')
+  async checkPasswordReset(@Body() data: CheckPasswordResetDto) {
+    return this.authService.checkPasswordResetToken(
+      data.email,
+      data.resetToken,
+    );
+  }
+
+  @Cron(CronExpression.EVERY_30_MINUTES, { name: 'deleteOldResets' })
+  @Get('password-reset/delete-old')
+  async deleteOldResets() {
+    const startTime = new Date(new Date().getTime() - 600001);
+    return this.userService.deletePasswordResetsOlderThan(startTime);
   }
 }

@@ -11,6 +11,8 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import { BcryptService } from '@utils/auth/bcrypt';
 import { EnvironmentVariables } from '@utils/config/config';
+import { randomBytesAsync } from '@utils/crypto';
+import { randomBytes } from 'crypto';
 import { validatedJwtUserInfo } from './types';
 
 @Injectable()
@@ -136,5 +138,50 @@ export class AuthService {
     const tokens = await this.getTokens(user.id, user.email);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
     return tokens;
+  }
+
+  async sendPasswordResetEmail(email: string) {
+    const user = await this.usersService.findByEmail(email);
+    if (!user) {
+      throw new ForbiddenException('Access Denied: User not found');
+    }
+    const buffer = await randomBytesAsync(20);
+    const token = buffer.toString('hex');
+    await this.usersService.deleteAllPAsswordResetsByUserId(user.id);
+
+    const reset = await this.usersService.createPasswordReset(user.id, token);
+    this.logger.log(
+      `Sending password reset email to ${email} with magic id ${reset.token}`,
+    );
+    return { message: `Password reset email sent to ${email}` };
+  }
+
+  async checkPasswordResetToken(email: string, token: string) {
+    const user = await this.usersService.findByEmail(email);
+
+    if (!user) {
+      throw new ForbiddenException('Access Denied: User not found');
+    }
+    const reset = await this.usersService.findPasswordReset(user.id, token);
+    if (!reset) {
+      throw new ForbiddenException(
+        'Access Denied: Email mismatch with reset token',
+      );
+    }
+    // There is a valid password reset token, so delete it
+    await this.usersService.deleteAllPAsswordResetsByUserId(user.id);
+    const isOutdated =
+      new Date().getTime() - reset.createdAt.getTime() > 600000; // 10 minutes in milliseconds
+    if (isOutdated) {
+      throw new ForbiddenException(
+        'Access Denied: Password reset token expired. Reset code deleted, please start over.',
+      );
+    }
+    const tokens = await this.getTokens(user.id, user.email);
+    return {
+      email: user.email,
+      message: 'Password reset token is valid',
+      tokens: tokens,
+    };
   }
 }

@@ -85,4 +85,45 @@ export class UsersService {
   async remove(id: string) {
     return this.prismaService.user.delete({ where: { id: id } });
   }
+
+  async deleteAllPAsswordResetsByUserId(userId: string) {
+    return this.prismaService.passwordReset.deleteMany({
+      where: { userId: userId },
+    });
+  }
+
+  async createPasswordReset(userId: string, token: string) {
+    return this.prismaService.passwordReset.create({
+      data: {
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
+        token: token,
+      },
+    });
+  }
+
+  async findPasswordReset(userId: string, token: string) {
+    return this.prismaService.passwordReset.findUnique({
+      where: { token: token, userId: userId },
+    });
+  }
+
+  async deletePasswordResetsOlderThan(date: Date) {
+    return this.prismaService.passwordReset.deleteMany({
+      where: {
+        createdAt: {
+          lt: date,
+        },
+      },
+    });
+  }
+
+  async deletePasswordReset(id: string) {
+    return this.prismaService.passwordReset.delete({
+      where: { id: id },
+    });
+  }
 }
