@@ -86,7 +86,7 @@ export class UsersService {
     return this.prismaService.user.delete({ where: { id: id } });
   }
 
-  async deleteAllByUserId(userId: string) {
+  async deleteAllPAsswordResetsByUserId(userId: string) {
     return this.prismaService.passwordReset.deleteMany({
       where: { userId: userId },
     });
@@ -121,9 +121,9 @@ export class UsersService {
     });
   }
 
-  async deletePasswordReset(token: string) {
+  async deletePasswordReset(id: string) {
     return this.prismaService.passwordReset.delete({
-      where: { token: token },
+      where: { id: id },
     });
   }
 }

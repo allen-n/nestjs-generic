@@ -147,7 +147,7 @@ export class AuthService {
     }
     const buffer = randomBytes(20);
     const token = buffer.toString('hex');
-    await this.usersService.deleteAllByUserId(user.id);
+    await this.usersService.deleteAllPAsswordResetsByUserId(user.id);
 
     const reset = await this.usersService.createPasswordReset(user.id, token);
     this.logger.log(
@@ -156,10 +156,7 @@ export class AuthService {
     return { message: `Password reset email sent to ${email}` };
   }
 
-  async checkPasswordResetToken(
-    email: string,
-    token: string,
-  ): Promise<PasswordResetResponseDto> {
+  async checkPasswordResetToken(email: string, token: string) {
     const user = await this.usersService.findByEmail(email);
 
     if (!user) {
@@ -172,7 +169,7 @@ export class AuthService {
       );
     }
     // There is a valid password reset token, so delete it
-    await this.usersService.deletePasswordReset(reset.id);
+    await this.usersService.deleteAllPAsswordResetsByUserId(user.id);
     const isOutdated =
       new Date().getTime() - reset.createdAt.getTime() > 600000; // 10 minutes in milliseconds
     if (isOutdated) {
@@ -180,9 +177,10 @@ export class AuthService {
         'Access Denied: Password reset token expired',
       );
     }
+    const tokens = this.getTokens(user.id, user.email);
     return {
-      message: 'Password reset token is valid',
-      valid: true,
+      email: user.email,
+      tokens: tokens,
     };
   }
 }
