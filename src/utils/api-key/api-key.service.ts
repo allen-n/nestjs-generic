@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { CreateApiKeyResponseDto } from '@utils/api-key/dto/create-api-key-success.dto';
 import { CreateApiKeyDto } from '@utils/api-key/dto/create-api-key.dto';
+import { randomBytesAsync } from '@utils/crypto';
 import { PrismaService } from '@utils/prisma/prisma.service';
-import { randomBytes } from 'crypto';
 
 @Injectable()
 export class ApiKeyService {
@@ -12,7 +12,7 @@ export class ApiKeyService {
   async createKey(
     createApiKeyDto: CreateApiKeyDto,
   ): Promise<CreateApiKeyResponseDto> {
-    const buffer = randomBytes(32);
+    const buffer = await randomBytesAsync(32);
     const keyHexString = `sk-${buffer.toString('hex')}`;
     const existingKeys = await this.findKeyByOwner(createApiKeyDto.userId);
     const result = await this.prismaService.apiKey.create({

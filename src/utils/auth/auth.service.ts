@@ -11,9 +11,9 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import { BcryptService } from '@utils/auth/bcrypt';
 import { EnvironmentVariables } from '@utils/config/config';
-import { validatedJwtUserInfo } from './types';
+import { randomBytesAsync } from '@utils/crypto';
 import { randomBytes } from 'crypto';
-import { PasswordResetResponseDto } from '@utils/auth/dto/password-reset.dto';
+import { validatedJwtUserInfo } from './types';
 
 @Injectable()
 export class AuthService {
@@ -145,7 +145,7 @@ export class AuthService {
     if (!user) {
       throw new ForbiddenException('Access Denied: User not found');
     }
-    const buffer = randomBytes(20);
+    const buffer = await randomBytesAsync(20);
     const token = buffer.toString('hex');
     await this.usersService.deleteAllPAsswordResetsByUserId(user.id);
 
@@ -174,12 +174,13 @@ export class AuthService {
       new Date().getTime() - reset.createdAt.getTime() > 600000; // 10 minutes in milliseconds
     if (isOutdated) {
       throw new ForbiddenException(
-        'Access Denied: Password reset token expired',
+        'Access Denied: Password reset token expired. Reset code deleted, please start over.',
       );
     }
-    const tokens = this.getTokens(user.id, user.email);
+    const tokens = await this.getTokens(user.id, user.email);
     return {
       email: user.email,
+      message: 'Password reset token is valid',
       tokens: tokens,
     };
   }
