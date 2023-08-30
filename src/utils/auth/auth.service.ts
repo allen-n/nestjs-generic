@@ -153,6 +153,8 @@ export class AuthService {
     this.logger.log(
       `Sending password reset email to ${email} with magic id ${reset.token}`,
     );
+
+    // Note: You can use the EmailService to send emails here if desired, though the url will depend on your frontend implementation
     return { message: `Password reset email sent to ${email}` };
   }
 

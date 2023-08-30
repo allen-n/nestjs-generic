@@ -1,15 +1,14 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EnvironmentVariables } from '@utils/config/config';
 import { Resend } from 'resend';
-import {
-  CreateEmailOptions,
-  CreateEmailResponse,
-} from 'resend/build/src/emails/interfaces';
 
+/**
+ * A wrapper around the Resend API client.
+ * @see https://resend.com/docs/introduction
+ */
 @Injectable()
 export class EmailService extends Resend {
-  private logger = new Logger(EmailService.name);
   constructor(
     private readonly configService: ConfigService<EnvironmentVariables>,
   ) {
@@ -20,15 +19,5 @@ export class EmailService extends Resend {
       );
     }
     super(apiKey);
-  }
-
-  /**
-   * Send an email
-   * @param data
-   * @returns
-   */
-  async sendEmail(data: CreateEmailOptions): Promise<CreateEmailResponse> {
-    this.logger.log(`Sending email to ${data.to}`);
-    return super.sendEmail(data);
   }
 }
