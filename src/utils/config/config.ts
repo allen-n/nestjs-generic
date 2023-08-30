@@ -8,6 +8,7 @@ export interface EnvironmentVariables {
   PORT: number;
   NODE_ENV: string;
   FRONTEND_URL: string;
+  RESEND_API_KEY: string;
 }
 
 export const configValidationSchema = Joi.object({
@@ -20,4 +21,5 @@ export const configValidationSchema = Joi.object({
     .valid('development', 'production', 'test', 'provision')
     .default('development'),
   FRONTEND_URL: Joi.string().required(),
+  RESEND_API_KEY: Joi.string().optional(),
 });
