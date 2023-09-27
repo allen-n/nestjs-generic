@@ -1,6 +1,8 @@
 # Generic NestJs Backend
 
-This is a generic nestjs backend that can be used to create a backend for any project. It can be deployed anywhere that you can deploy a docker container, and hooked up to any postgres database provider. It also includes instructions and configuration for easy local debugging.
+This is a generic nestjs backend that can be used to create a backend for any project. It can be deployed anywhere that you can deploy a docker container, and hooked up to any postgres database provider. It also includes instructions and configuration for easy local debugging. You can 1-click deploy on railway using the link below (you'll need to create a railway account first).
+
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/5eHaqw?referralCode=gPQRvt)
 
 ## Features
 
