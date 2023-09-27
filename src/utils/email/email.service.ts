@@ -19,7 +19,7 @@ export class EmailService extends Resend {
 
     super(apiKey);
     if (apiKey === defaultKey) {
-      this.logger.warn(
+      this.logger.error(
         'RESEND_API_KEY is set to the default value. Emails will not be sent.',
       );
     }
