@@ -5,8 +5,9 @@ This is a generic nestjs backend that can be used to create a backend for any pr
 ## Features
 
 * User authentication (using JWTs, refresh tokens, etc.)
-* Creating users and organizations
+* Creating users and organizations (i.e. multi tenant support)
 * Creating and issuing API keys with attached scopes
+* Transactional email using resend
 
 ## Tools used
 
@@ -20,12 +21,10 @@ This is a generic nestjs backend that can be used to create a backend for any pr
 
 ## Contributing
 
-1. Branch all PRs from the `dev` branch using the branch name from Linear (cmd+shift+. on mac).
+1. Branch all PRs from the `main` branch using the branch name from Linear (cmd+shift+. on mac).
 2. Do your work.
-3. Push upstream and open a PR to merge into `dev`.
-4. Once the PR is approved, merge it into `dev`. This will push the changes to the staging environment.
-5. Once the staging environment has been confirmed healthy (by running automated and manual tests), 1x daily we'll merge `dev` into `main` and deploy to production.
-6. Once `dev` is merged into `main` (using a merge commit), the changes will be deployed to production.
+3. Push upstream and open a PR to merge into `main`.
+4. Once the PR is approved, merge it into `main`. This will push the changes to the prod environment.
 
 ## How to work on the API locally
 
